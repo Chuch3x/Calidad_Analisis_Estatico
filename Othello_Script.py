@@ -44,21 +44,30 @@ def get_player_tokens(board, player):
 def get_valid_moves(board, player):
     valid_moves = []
     for token in get_player_tokens(board, player):
-        for differenceRow in [-1, 0, 1]: 
-            for differenceColumn in [-1, 0, 1]:
-                if differenceRow == 0 and differenceColumn == 0:
-                    continue
-                adyRow = token[0] + differenceRow
-                adyCol = token[1] + differenceColumn
-                
-                if 0 <= adyRow < N and 0 <= adyCol < N and board[adyRow][adyCol] == -player:
-                    while 0 <= adyRow < N and 0 <= adyCol < N and board[adyRow][adyCol] == -player:
-                        adyRow += differenceRow
-                        adyCol += differenceColumn
-                        
-                    if 0 <= adyRow < N and 0 <= adyCol < N and board[adyRow][adyCol] == EMPTY:
-                        valid_moves.append((adyRow, adyCol))
+        valid_moves.extend(find_valid_moves_around_token(board, player, token))
+    return list(set(valid_moves))  # Eliminar duplicados
+
+def find_valid_moves_around_token(board, player, token):
+    valid_moves = []
+    for diff_row, diff_col in get_directions():
+        ady_row, ady_col = token[0] + diff_row, token[1] + diff_col
+        if is_opponent_piece(board, ady_row, ady_col, player):
+            valid_move = find_empty_spot_in_direction(board, player, ady_row, ady_col, diff_row, diff_col)
+            if valid_move:
+                valid_moves.append(valid_move)
     return valid_moves
+
+def is_opponent_piece(board, row, col, player):
+    return 0 <= row < N and 0 <= col < N and board[row][col] == -player
+
+def find_empty_spot_in_direction(board, player, row, col, diff_row, diff_col):
+    while 0 <= row < N and 0 <= col < N and board[row][col] == -player:
+        row += diff_row
+        col += diff_col
+    if 0 <= row < N and 0 <= col < N and board[row][col] == EMPTY:
+        return row, col
+    return None
+
 
 def make_move(board, player, move):
     row, col = move
