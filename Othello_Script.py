@@ -61,25 +61,41 @@ def get_valid_moves(board, player):
     return valid_moves
 
 def make_move(board, player, move):
-    row = move[0]
-    col = move[1]
-    if not is_valid_move(get_valid_moves(board,player), move):
+    row, col = move
+
+    # Verificar si el movimiento es válido
+    if not is_valid_move(get_valid_moves(board, player), move):
         return False
+    
+    # Realizar el movimiento
     board[row][col] = player
-    for differenceRow in [-1, 0, 1]:
-        for differenceColumn in [-1, 0, 1]:
-            if differenceRow == 0 and differenceColumn == 0:
-                continue
-            newRow, newColumn = row + differenceRow, col + differenceColumn
-            to_flip = []
-            while 0 <= newRow < N and 0 <= newColumn < N and board[newRow][newColumn] == -player:
-                to_flip.append((newRow, newColumn))
-                newRow += differenceRow
-                newColumn += differenceColumn
-            if 0 <= newRow < N and 0 <= newColumn < N and board[newRow][newColumn] == player:
-                for flip_row, flip_col in to_flip:
-                    board[flip_row][flip_col] = player
+    
+    # Revisar las direcciones para voltear fichas
+    for diff_row, diff_col in get_directions():
+        flip_positions = get_flip_positions(board, player, row, col, diff_row, diff_col)
+        if flip_positions:
+            flip_pieces(board, player, flip_positions)
+    
     return True
+
+def get_directions():
+    return [(dr, dc) for dr in [-1, 0, 1] for dc in [-1, 0, 1] if not (dr == 0 and dc == 0)]
+
+def get_flip_positions(board, player, row, col, diff_row, diff_col):
+    to_flip = []
+    new_row, new_col = row + diff_row, col + diff_col
+    while 0 <= new_row < N and 0 <= new_col < N and board[new_row][new_col] == -player:
+        to_flip.append((new_row, new_col))
+        new_row += diff_row
+        new_col += diff_col
+    if 0 <= new_row < N and 0 <= new_col < N and board[new_row][new_col] == player:
+        return to_flip
+    return []
+
+def flip_pieces(board, player, positions):
+    for flip_row, flip_col in positions:
+        board[flip_row][flip_col] = player
+
 
 def get_score(board):
     black_score = sum(row.count(BLACK) for row in board)
