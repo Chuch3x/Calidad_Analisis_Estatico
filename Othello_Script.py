@@ -322,56 +322,45 @@ def play_othello_vs_AI():
                 print("Tie.")
             break
 
+def get_player_move(board, current_player):
+    valid_moves = get_valid_moves(board, current_player)
+    if not valid_moves:
+        return None
+    
+    while True:
+        try:
+            row = int(input("ROW: "))
+            col = int(input("COLUMN: "))
+            if is_valid_move(valid_moves, (row, col)):
+                return row, col
+            print("Invalid move. Try again.")
+        except ValueError:
+            print("Invalid entry. Enter valid numbers.")
+
 def play_othello_vs_player():
     board = initialize_board()
     current_player = BLACK
-    while True:
+    
+    while not terminal_test(board):
         print_board(board)
-        print("Actual player:", "X" if current_player == BLACK else "O")
+        print("Current player:", "X" if current_player == BLACK else "O")
         
-        if current_player == BLACK:
-            while True:
-                try:
-                    row = int(input("ROW: "))
-                    col = int(input("COLUMN: "))
-                    if is_valid_move(get_valid_moves(board,current_player), (row,col)):
-                        break
-                    else:
-                        if len(get_valid_moves(board,current_player)) == 0:
-                            current_player = -current_player
-                            continue
-                        print("Invalid move. Try again.")
-                except ValueError:
-                    print("Invalid entry. Enter valid numbers.")
-            make_move(board, current_player, (row,col))
+        move = get_player_move(board, current_player)
+        if move:
+            make_move(board, current_player, move)
             current_player = -current_player
         else:
-            while True:
-                try:
-                    row = int(input("ROW: "))
-                    col = int(input("COLUMN: "))
-                    if is_valid_move(get_valid_moves(board,current_player), (row,col)):
-                        break
-                    else:
-                        if len(get_valid_moves(board,current_player)) == 0:
-                            current_player = -current_player
-                            continue
-                        print("Invalid move. Try again.")
-                except ValueError:
-                    print("Invalid entry. Enter valid numbers.")
-            make_move(board, current_player, (row,col))
+            print(f"{'X' if current_player == BLACK else 'O'} has no valid moves.")
             current_player = -current_player
-        
-        if terminal_test(board):
-            print_board(board)
-            black_score, white_score = get_score(board)
-            if black_score > white_score:
-                print("X won.")
-            elif white_score > black_score:
-                print("O won.")
-            else:
-                print("Tie.")
-                break
+    
+    print_board(board)
+    black_score, white_score = get_score(board)
+    if black_score > white_score:
+        print("X won.")
+    elif white_score > black_score:
+        print("O won.")
+    else:
+        print("Tie.")
 
 def play_othello_AI_vs_AI():
     board = initialize_board()
