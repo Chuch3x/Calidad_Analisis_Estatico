@@ -142,54 +142,68 @@ def get_min_max_move(board, player):
     else:
         return (-1, -1)
 
-def play_othello_vs_AI():
+def play_othello_vs_ai():
     board = initialize_board()
     current_player = BLACK
-    while True:
+    while not terminal_test(board):
         print_board(board)
         print("Actual player:", "X" if current_player == BLACK else "O")
         
         if current_player == WHITE:
-            row, col = get_min_max_move(board, current_player)
-            if row == -1 and col == -1:
-                print("O HAS NO MOVEMENTS")
-                current_player = -current_player
-                continue
+            handle_ai_turn(board, current_player)
         else:
-            while True:
-                try: 
-                    print("My Movements: ",get_valid_moves(board,current_player))
-                    if len(get_valid_moves(board,current_player)) == 0:
-                        print("You have no movements available")
-                        break
-                    row = int(input("ROW: "))
-                    col = int(input("COLUMN: "))
-                    if is_valid_move(get_valid_moves(board,current_player), (row,col)):
-                        break
-                    print("Invalid move. Try again.")
-                except ValueError:
-                    print("Invalid entry. Enter valid numbers.")
+            handle_player_turn(board, current_player)
         
-        make_move(board, current_player, (row,col))
         current_player = -current_player
-        
-        if terminal_test(board):
-            print_board(board)
-            black_score, white_score = get_score(board)
-            print("States: ", COUNTER)
-            if black_score > white_score:
-                print("X Won.")
-            elif white_score > black_score:
-                print("O Won.")
-            else:
-                print("Tie.")
-            break
+    
+    display_game_result(board)
+
+def handle_ai_turn(board, player):
+    row, col = get_min_max_move(board, player)
+    if row == -1 and col == -1:
+        print("O HAS NO MOVEMENTS")
+    else:
+        make_move(board, player, (row, col))
+
+def handle_player_turn(board, player):
+    valid_moves = get_valid_moves(board, player)
+    print("My Movements:", valid_moves)
+    
+    if not valid_moves:
+        print("You have no movements available")
+        return
+    
+    while True:
+        try:
+            row, col = get_player_input()
+            if is_valid_move(valid_moves, (row, col)):
+                make_move(board, player, (row, col))
+                break
+            print("Invalid move. Try again.")
+        except ValueError:
+            print("Invalid entry. Enter valid numbers.")
+
+def get_player_input():
+    row = int(input("ROW: "))
+    col = int(input("COLUMN: "))
+    return row, col
+
+def display_game_result(board):
+    print_board(board)
+    black_score, white_score = get_score(board)
+    print("States:", COUNTER)
+    if black_score > white_score:
+        print("X Won.")
+    elif white_score > black_score:
+        print("O Won.")
+    else:
+        print("Tie.")
 
 if __name__ == "__main__":
     opcion = 0
     print(" PLAYER VS IA")
     start_time = time.time()
-    play_othello_vs_AI()
+    play_othello_vs_ai()
     end_time = time.time()
     execution_time = end_time - start_time
     print(f"Execution Time: {execution_time} seconds")
