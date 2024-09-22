@@ -71,15 +71,9 @@ def find_empty_spot_in_direction(board, player, row, col, diff_row, diff_col):
 
 def make_move(board, player, move):
     row, col = move
-
-    # Verificar si el movimiento es válido
     if not is_valid_move(get_valid_moves(board, player), move):
         return False
-    
-    # Realizar el movimiento
     board[row][col] = player
-    
-    # Revisar las direcciones para voltear fichas
     for diff_row, diff_col in get_directions():
         flip_positions = get_flip_positions(board, player, row, col, diff_row, diff_col)
         if flip_positions:
@@ -235,42 +229,8 @@ def Min_Max_Alpha_Beta_Heuristic_Pruning_heuristic_1(board, depth, player, alpha
     return evaluate_board(board, player, depth, alpha, beta, maximizing_player, heuristic_function)
 
 def Min_Max_Alpha_Beta_Heuristic_Pruning_heuristic_2(board, depth, player, alpha, beta, maximizing_player):
-    if depth == 0 or terminal_test(board):
-        return heuristic_look_for_corners_and_borders(board, player), 0
-    
-    valid_moves = get_valid_moves(board, player)
-    if maximizing_player:
-        max_val = float('-inf')
-        best_move = None
-        for move in valid_moves:
-            new_board = copy.deepcopy(board)
-            make_move(new_board, player, move)
-            evaluation, best_move = Min_Max_Alpha_Beta_Heuristic_Pruning_heuristic_2(new_board, depth - 1, player, alpha, beta, False)
-            
-            if evaluation > max_val:
-                max_val = evaluation
-                best_move = move
-
-            alpha = max(alpha, evaluation)
-            if beta <= alpha:
-                break
-        return max_val, best_move
-    else:
-        min_val = float('inf')
-        best_move = None
-        for move in valid_moves:
-            new_board = copy.deepcopy(board)
-            make_move(new_board, -player, move)
-            evaluation, best_move = Min_Max_Alpha_Beta_Heuristic_Pruning_heuristic_2(new_board, depth - 1, player, alpha, beta, True)
-
-            if evaluation < min_val:
-                min_val = evaluation
-                best_move = move
-
-            beta = min(beta, evaluation)
-            if beta <= alpha:
-                break
-        return min_val, best_move
+    heuristic_function = heuristic_look_for_corners_and_borders
+    return evaluate_board(board, player, depth, alpha, beta, maximizing_player, heuristic_function)
 
 def get_min_max_move(board, player, depth):
     valid_moves = get_valid_moves(board, player)
