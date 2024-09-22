@@ -43,22 +43,47 @@ def get_player_tokens(board, player):
 
 def get_valid_moves(board, player):
     valid_moves = []
-    for token in get_player_tokens(board, player):
-        for differenceRow in [-1, 0, 1]: 
-            for differenceColumn in [-1, 0, 1]:
-                if differenceRow == 0 and differenceColumn == 0:
-                    continue
-                adyRow = token[0] + differenceRow
-                adyCol = token[1] + differenceColumn
-                
-                if 0 <= adyRow < N and 0 <= adyCol < N and board[adyRow][adyCol] == -player:
-                    while 0 <= adyRow < N and 0 <= adyCol < N and board[adyRow][adyCol] == -player:
-                        adyRow += differenceRow
-                        adyCol += differenceColumn
-                        
-                    if 0 <= adyRow < N and 0 <= adyCol < N and board[adyRow][adyCol] == EMPTY:
-                        valid_moves.append((adyRow, adyCol))
+    for token_position in get_player_tokens(board, player):
+        valid_moves += find_valid_moves_for_token(board, token_position, player)
     return valid_moves
+
+
+def find_valid_moves_for_token(board, token_position, player):
+    directions = get_all_directions()
+    valid_moves = []
+
+    for row_offset, col_offset in directions:
+        if is_opponent_adjacent(board, token_position, row_offset, col_offset, player):
+            valid_move = explore_in_direction(board, token_position, row_offset, col_offset, player)
+            if valid_move:
+                valid_moves.append(valid_move)
+    
+    return valid_moves
+
+
+def get_all_directions():
+    return [(row_offset, col_offset) for row_offset in [-1, 0, 1] for col_offset in [-1, 0, 1] if not (row_offset == 0 and col_offset == 0)]
+
+
+def is_opponent_adjacent(board, token_position, row_offset, col_offset, player):
+    adjacent_row = token_position[0] + row_offset
+    adjacent_col = token_position[1] + col_offset
+    return (0 <= adjacent_row < N and 0 <= adjacent_col < N and board[adjacent_row][adjacent_col] == -player)
+
+
+def explore_in_direction(board, token_position, row_offset, col_offset, player):
+    current_row = token_position[0] + row_offset
+    current_col = token_position[1] + col_offset
+    
+    while 0 <= current_row < N and 0 <= current_col < N and board[current_row][current_col] == -player:
+        current_row += row_offset
+        current_col += col_offset
+
+    if 0 <= current_row < N and 0 <= current_col < N and board[current_row][current_col] == EMPTY:
+        return current_row, current_col
+
+    return None
+
 
 def make_move(board, player, move):
     row = move[0]
