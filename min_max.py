@@ -86,25 +86,40 @@ def explore_in_direction(board, token_position, row_offset, col_offset, player):
 
 
 def make_move(board, player, move):
-    row = move[0]
-    col = move[1]
-    if not is_valid_move(get_valid_moves(board,player), move):
+    row, col = move
+    if not is_valid_move(get_valid_moves(board, player), move):
         return False
+
     board[row][col] = player
-    for differenceRow in [-1, 0, 1]:
-        for differenceColumn in [-1, 0, 1]:
-            if differenceRow == 0 and differenceColumn == 0:
-                continue
-            newRow, newColumn = row + differenceRow, col + differenceColumn
-            to_flip = []
-            while 0 <= newRow < N and 0 <= newColumn < N and board[newRow][newColumn] == -player:
-                to_flip.append((newRow, newColumn))
-                newRow += differenceRow
-                newColumn += differenceColumn
-            if 0 <= newRow < N and 0 <= newColumn < N and board[newRow][newColumn] == player:
-                for flip_row, flip_col in to_flip:
-                    board[flip_row][flip_col] = player
+    directions = get_all_directions()
+
+    for row_offset, col_offset in directions:
+        flip_positions = collect_positions_to_flip(board, player, row, col, row_offset, col_offset)
+        if flip_positions:
+            flip_tokens(board, player, flip_positions)
+
     return True
+
+
+def collect_positions_to_flip(board, player, row, col, row_offset, col_offset):
+    positions_to_flip = []
+    current_row, current_col = row + row_offset, col + col_offset
+
+    while 0 <= current_row < N and 0 <= current_col < N and board[current_row][current_col] == -player:
+        positions_to_flip.append((current_row, current_col))
+        current_row += row_offset
+        current_col += col_offset
+
+    if 0 <= current_row < N and 0 <= current_col < N and board[current_row][current_col] == player:
+        return positions_to_flip
+
+    return []
+
+
+def flip_tokens(board, player, positions_to_flip):
+    for flip_row, flip_col in positions_to_flip:
+        board[flip_row][flip_col] = player
+
 
 def get_score(board):
     black_score = sum(row.count(BLACK) for row in board)
