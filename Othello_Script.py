@@ -122,58 +122,55 @@ def heuristic_weak(board, player):
         return white_score - black_score
 
 def heuristic_look_for_corners_and_center(board, player):
+    # Matriz de puntajes
+    score_matrix = [
+        [20, 0, 10, 10, 10, 10, 0, 20],  # Fila 0
+        [0, 0, 10, 10, 10, 10, 0, 0],    # Fila 1
+        [10, 10, 10, 10, 10, 10, 10, 10],# Fila 2
+        [10, 10, 5, 5, 5, 5, 10, 10],    # Fila 3
+        [10, 10, 5, 5, 5, 5, 10, 10],    # Fila 4
+        [10, 10, 10, 10, 10, 10, 10, 10],# Fila 5
+        [0, 0, 10, 10, 10, 10, 0, 0],    # Fila 6
+        [20, 0, 10, 10, 10, 10, 0, 20],  # Fila 7
+    ]
+    
     value = 0
     for i in range(8):
         for j in range(8):
             if board[i][j] == player:
-                if (i == 0 and j == 0) or (i == 7 and j == 7) or \
-                   (i == 0 and j == 7) or (i == 7 and j == 0):
-                    value += 20 # Cornes value = 20
-                elif (i == 3 and j == 3) or (i == 3 and j == 4) or \
-                     (i == 4 and j == 3) or (i == 4 and j == 4):
-                    value += 5 # Centers value = 5
-                elif (i == 0 and j == 1) or (i == 1 and j == 0) or \
-                     (i == 7 and j == 1) or (i == 6 and j == 0) or \
-                     (i == 0 and j == 6) or (i == 1 and j == 7) or \
-                     (i == 7 and j == 6) or (i == 6 and j == 7) or \
-                     (i == 1 and j == 1) or (i == 6 and j == 6) or \
-                     (i == 6 and j == 1) or (i == 1 and j == 6):
-                    value += 0 # positions adjacent to corners, value = 0
-                else:
-                    value += 10 # any other position, value = 10
+                value += score_matrix[i][j]
+    
     return value
 
 def heuristic_look_for_corners_and_borders(board, turn):
+    # Definir posiciones importantes
+    corner_positions = [(0, 0), (7, 7), (0, 7), (7, 0)]
+    adjacent_to_corners = [(0, 1), (1, 0), (7, 1), (6, 0), (0, 6), (1, 7), (7, 6), (6, 7)]
+    diagonal_to_corners = [(1, 1), (6, 6), (1, 6), (6, 1)]
+    border_columns = [(0, 2), (0, 5), (7, 2), (7, 5), (2, 0), (5, 0), (2, 7), (5, 7)]
+    border_rows = [(0, 3), (0, 4), (7, 3), (7, 4), (3, 0), (4, 0), (3, 7), (4, 7)]
+    
+    # Inicializar valor
     value = 0
+    
+    # Iterar sobre el tablero
     for i in range(8):
         for j in range(8):
             if board[i][j] == turn:
-                if (i == 0 and j == 0) or (i == 7 and j == 7) or \
-                   (i == 0 and j == 7) or (i == 7 and j == 0):
-                    value += 50 #corners, value = 50
-                elif (i == 3 and j == 3) or (i == 3 and j == 4) or \
-                     (i == 4 and j == 3) or (i == 4 and j == 4):
-                    pass # centers no value
-                elif (i == 0 and j == 1) or (i == 1 and j == 0) or \
-                     (i == 7 and j == 1) or (i == 6 and j == 0) or \
-                     (i == 0 and j == 6) or (i == 1 and j == 7) or \
-                     (i == 7 and j == 6) or (i == 6 and j == 7):
-                     value -= 1 #positions adjacent to corners, value = -1
-                elif (i == 1 and j == 1) or (i == 6 and j == 6) or \
-                     (i == 6 and j == 1) or (i == 1 and j == 6):
-                     value -= 10 #adjacent diagonal to the corner, value = -10
-                elif (i == 0 and j == 2) or (i == 0 and j == 5) or \
-                     (i == 7 and j == 2) or (i == 7 and j == 5) or \
-                     (i == 2 and j == 0) or (i == 5 and j == 0) or \
-                     (i == 2 and j == 7) or (i == 5 and j == 7):
-                     value += 5 # border column, value = 5
-                elif (i == 0 and j == 3) or (i == 0 and j == 4) or \
-                     (i == 7 and j == 3) or (i == 7 and j == 4) or \
-                     (i == 3 and j == 0) or (i == 4 and j == 0) or \
-                     (i == 3 and j == 7) or (i == 4 and j == 7):
-                     value += 2 # border row, value = 2
+                position = (i, j)
+                if position in corner_positions:
+                    value += 50
+                elif position in adjacent_to_corners:
+                    value -= 1
+                elif position in diagonal_to_corners:
+                    value -= 10
+                elif position in border_columns:
+                    value += 5
+                elif position in border_rows:
+                    value += 2
                 else:
-                     value += 1 # any other position, value = 1
+                    value += 1
+
     return value
 
 
