@@ -178,43 +178,61 @@ def heuristic_look_for_corners_and_borders(board, turn):
 
 
 
-def Min_Max_Alpha_Beta_Heuristic_Pruning_heuristic_1(board, depth, player, alpha, beta, maximizing_player):
+def evaluate_board(board, player, depth, alpha, beta, maximizing_player, heuristic_function):
     if depth == 0 or terminal_test(board):
-        return heuristic_look_for_corners_and_center(board, player), 0
+        return heuristic_function(board, player), None  # Siempre devolver un valor válido
     
     valid_moves = get_valid_moves(board, player)
+    
+    # Si no hay movimientos válidos, devolver None para evitar errores
+    if not valid_moves:
+        return heuristic_function(board, player), None
+
     if maximizing_player:
-        max_val = float('-inf')
-        best_move = None
-        for move in valid_moves:
-            new_board = copy.deepcopy(board)
-            make_move(new_board, player, move)
-            evaluation, best_move = Min_Max_Alpha_Beta_Heuristic_Pruning_heuristic_1(new_board, depth - 1, player, alpha, beta, False)
-            
-            if evaluation > max_val:
-                max_val = evaluation
-                best_move = move
-
-            alpha = max(alpha, evaluation)
-            if beta <= alpha:
-                break
-        return max_val, best_move
+        return maximize(board, player, depth, alpha, beta, valid_moves, heuristic_function)
     else:
-        min_val = float('inf')
-        best_move = None
-        for move in valid_moves:
-            new_board = copy.deepcopy(board)
-            make_move(new_board, -player, move)
-            evaluation, best_move = Min_Max_Alpha_Beta_Heuristic_Pruning_heuristic_1(new_board, depth - 1, player, alpha, beta, True)
+        return minimize(board, player, depth, alpha, beta, valid_moves, heuristic_function)
 
-            if evaluation < min_val:
-                min_val = evaluation
-                best_move = move
 
-            beta = min(beta, evaluation)
-            if beta <= alpha:
-                break
-        return min_val, best_move
+def maximize(board, player, depth, alpha, beta, valid_moves, heuristic_function):
+    max_val = float('-inf')
+    best_move = None
+    for move in valid_moves:
+        new_board = copy.deepcopy(board)
+        make_move(new_board, player, move)
+        evaluation, _ = evaluate_board(new_board, player, depth - 1, alpha, beta, False, heuristic_function)
+
+        if evaluation > max_val:
+            max_val = evaluation
+            best_move = move
+
+        alpha = max(alpha, evaluation)
+        if beta <= alpha:
+            break
+    return max_val, best_move
+
+
+def minimize(board, player, depth, alpha, beta, valid_moves, heuristic_function):
+    min_val = float('inf')
+    best_move = None
+    for move in valid_moves:
+        new_board = copy.deepcopy(board)
+        make_move(new_board, -player, move)
+        evaluation, _ = evaluate_board(new_board, player, depth - 1, alpha, beta, True, heuristic_function)
+
+        if evaluation < min_val:
+            min_val = evaluation
+            best_move = move
+
+        beta = min(beta, evaluation)
+        if beta <= alpha:
+            break
+    return min_val, best_move
+
+
+def Min_Max_Alpha_Beta_Heuristic_Pruning_heuristic_1(board, depth, player, alpha, beta, maximizing_player):
+    heuristic_function = heuristic_look_for_corners_and_center
+    return evaluate_board(board, player, depth, alpha, beta, maximizing_player, heuristic_function)
 
 def Min_Max_Alpha_Beta_Heuristic_Pruning_heuristic_2(board, depth, player, alpha, beta, maximizing_player):
     if depth == 0 or terminal_test(board):
