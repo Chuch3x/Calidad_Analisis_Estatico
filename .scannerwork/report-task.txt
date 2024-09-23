@@ -1,6 +1,15 @@
+<<<<<<< HEAD
 projectKey=Calidad-2024
 serverUrl=http://localhost:9000
 serverVersion=10.6.0.92116
 dashboardUrl=http://localhost:9000/dashboard?id=Calidad-2024
 ceTaskId=9632f85d-1ac5-408c-88fb-5ceaf570cc9d
 ceTaskUrl=http://localhost:9000/api/ce/task?id=9632f85d-1ac5-408c-88fb-5ceaf570cc9d
+=======
+projectKey=Calidad-Sept-2024
+serverUrl=http://localhost:9000
+serverVersion=10.6.0.92116
+dashboardUrl=http://localhost:9000/dashboard?id=Calidad-Sept-2024
+ceTaskId=62636635-7221-471c-9642-77e241a1a180
+ceTaskUrl=http://localhost:9000/api/ce/task?id=62636635-7221-471c-9642-77e241a1a180
+>>>>>>> fd63b65c7a580deaa5d152463fa6a11bbe8299a2
