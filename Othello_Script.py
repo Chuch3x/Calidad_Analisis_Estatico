@@ -339,7 +339,7 @@ def play_othello_vs_player():
     else:
         print("Tie.")
 
-def play_othello_AI_vs_AI():
+def play_othello_ai_vs_ai():
     board = initialize_board()
     current_player = BLACK
     while True:
@@ -348,34 +348,38 @@ def play_othello_AI_vs_AI():
         
         if current_player == WHITE:
             row, col = get_min_max_move(board, current_player, 3)
-            if row == -1 and col == -1:
-                print("O HAS NO MOVEMENTS")
-                current_player = -current_player
+            if handle_no_moves(board, current_player, row, col, "O"):
                 continue
         else:
             row, col = get_min_max_move_heuristic_2(board, current_player, 3)
-            if row == -1 and col == -1:
-                print("X HAS NO MOVEMENTS")
-                current_player = -current_player
+            if handle_no_moves(board, current_player, row, col, "X"):
                 continue
 
-        make_move(board, current_player, (row,col))
+        make_move(board, current_player, (row, col))
         current_player = -current_player
         
         if terminal_test(board):
-            print_board(board)
-            black_score, white_score = get_score(board)
-            if black_score > white_score:
-                print("X (ROBOCOP) WON. (HEURISTIC 2)")
-                print("Total X tokens:", get_score(board)[0])
-                print("Total O tokens:", get_score(board)[1])
-            elif white_score > black_score:
-                print("O (TERMINATOR) WON. (HEURISTIC 1)")
-                print("Total X tokens:", get_score(board)[0])
-                print("Total O tokens:", get_score(board)[1])
-            else:
-                print("Tie.")
+            handle_game_end(board)
             break
+
+def handle_no_moves(board, current_player, row, col, player_symbol):
+    if row == -1 and col == -1:
+        print(f"{player_symbol} HAS NO MOVEMENTS")
+        current_player = -current_player
+        return True
+    return False
+
+def handle_game_end(board):
+    print_board(board)
+    black_score, white_score = get_score(board)
+    if black_score > white_score:
+        print("X (ROBOCOP) WON. (HEURISTIC 2)")
+    elif white_score > black_score:
+        print("O (TERMINATOR) WON. (HEURISTIC 1)")
+    else:
+        print("Tie.")
+    print("Total X tokens:", black_score)
+    print("Total O tokens:", white_score)
 
 if __name__ == "__main__":
     opcion = 0
@@ -388,4 +392,4 @@ if __name__ == "__main__":
     elif opcion == 2:
         play_othello_vs_player()
     else:
-        play_othello_AI_vs_AI()
+        play_othello_ai_vs_ai()
