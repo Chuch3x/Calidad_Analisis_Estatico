@@ -333,10 +333,12 @@ def play_othello_ai_vs_ai():
         if current_player == WHITE:
             row, col = get_min_max_move(board, current_player, 3)
             if handle_no_moves(board, current_player, row, col, "O"):
+                current_player = -current_player  # Update current_player here
                 continue
         else:
             row, col = get_min_max_move_heuristic_2(board, current_player, 3)
             if handle_no_moves(board, current_player, row, col, "X"):
+                current_player = -current_player  # Update current_player here
                 continue
 
         make_move(board, current_player, (row, col))
@@ -349,7 +351,6 @@ def play_othello_ai_vs_ai():
 def handle_no_moves(board, current_player, row, col, player_symbol):
     if row == -1 and col == -1:
         print(f"{player_symbol} HAS NO MOVEMENTS")
-        current_player = -current_player
         return True
     return False
 
