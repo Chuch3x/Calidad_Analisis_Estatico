@@ -1,7 +1,7 @@
 import copy
 import time
 
-N = 6
+N = 4
 COUNTER = 0
 EMPTY = 0
 BLACK = 1
@@ -9,14 +9,14 @@ WHITE = -1
 
 def initialize_board():
     board = [[EMPTY] * N for _ in range(N)]
+    board[1][1] = BLACK
+    board[1][2] = WHITE
+    board[2][1] = WHITE
     board[2][2] = BLACK
-    board[2][3] = WHITE
-    board[3][2] = WHITE
-    board[3][3] = BLACK
     return board
 
 def print_board(board):
-    print("  0 1 2 3 4 5 ")
+    print("  0 1 2 3")
     for i in range(N):
         row = str(i) + " "
         for j in range(N):
