@@ -223,11 +223,11 @@ def minimize(board, player, depth, alpha, beta, valid_moves, heuristic_function)
     return min_val, best_move
 
 
-def Min_Max_Alpha_Beta_Heuristic_Pruning_heuristic_1(board, depth, player, alpha, beta, maximizing_player):
+def min_max_alpha_beta_heuristic_pruning_heuristic_1(board, depth, player, alpha, beta, maximizing_player):
     heuristic_function = heuristic_look_for_corners_and_center
     return evaluate_board(board, player, depth, alpha, beta, maximizing_player, heuristic_function)
 
-def Min_Max_Alpha_Beta_Heuristic_Pruning_heuristic_2(board, depth, player, alpha, beta, maximizing_player):
+def min_max_alpha_beta_heuristic_pruning_heuristic_2(board, depth, player, alpha, beta, maximizing_player):
     heuristic_function = heuristic_look_for_corners_and_borders
     return evaluate_board(board, player, depth, alpha, beta, maximizing_player, heuristic_function)
 
@@ -235,7 +235,7 @@ def get_min_max_move(board, player, depth):
     valid_moves = get_valid_moves(board, player)
 
     if len(valid_moves) > 0:
-        eval, best_move = Min_Max_Alpha_Beta_Heuristic_Pruning_heuristic_1(board, depth, player, float('-inf'), float('inf'), False)
+        eval, best_move = min_max_alpha_beta_heuristic_pruning_heuristic_1(board, depth, player, float('-inf'), float('inf'), False)
         print(best_move)
         if best_move == 0:
             return get_valid_moves(board, player)[0]
@@ -248,7 +248,7 @@ def get_min_max_move_heuristic_2(board, player, depth):
     valid_moves = get_valid_moves(board, player)
 
     if len(valid_moves) > 0:
-        eval, best_move = Min_Max_Alpha_Beta_Heuristic_Pruning_heuristic_2(board, depth, player, float('-inf'), float('inf'), False)
+        eval, best_move = min_max_alpha_beta_heuristic_pruning_heuristic_2(board, depth, player, float('-inf'), float('inf'), False)
         print(best_move)
         if best_move == 0:
             return get_valid_moves(board, player)[0]
@@ -257,7 +257,7 @@ def get_min_max_move_heuristic_2(board, player, depth):
     else:
         return (-1, -1)
 
-def play_othello_vs_AI():
+def play_othello_vs_ai():
     board = initialize_board()
     current_player = BLACK
     while True:
@@ -266,46 +266,30 @@ def play_othello_vs_AI():
         
         if current_player == WHITE:
             row, col = get_min_max_move(board, current_player, 3)
-            if row == -1 and col == -1:
-                print("O HAS NO MOVEMENTS")
-                current_player = -current_player
+            if handle_no_moves(board, current_player, row, col, "O"):
                 continue
         else:
-            while True:
-                try:
-                    print("My Movements: ",get_valid_moves(board,current_player))
-                    if len(get_valid_moves(board,current_player)) == 0:
-                        print("You have no movements available")
-                        break
-                    row = int(input("ROW: "))
-                    col = int(input("COLUMN: "))
-                    if is_valid_move(get_valid_moves(board,current_player), (row,col)):
-                        break
-                    print("Invalid move. Try again.")
-                except ValueError:
-                    print("Invalid entry. Enter valid numbers.")
+            row, col = get_player_move(board, current_player)
+            if row is None:
+                print("You have no movements available")
+                current_player = -current_player
+                continue
         
-        make_move(board, current_player, (row,col))
+        make_move(board, current_player, (row, col))
         current_player = -current_player
         
         if terminal_test(board):
-            print_board(board)
-            black_score, white_score = get_score(board)
-            if black_score > white_score:
-                print("X Won.")
-            elif white_score > black_score:
-                print("O Won.")
-            else:
-                print("Tie.")
+            handle_game_end(board)
             break
 
 def get_player_move(board, current_player):
     valid_moves = get_valid_moves(board, current_player)
     if not valid_moves:
-        return None
+        return None, None
     
     while True:
         try:
+            print("My Movements: ", valid_moves)
             row = int(input("ROW: "))
             col = int(input("COLUMN: "))
             if is_valid_move(valid_moves, (row, col)):
@@ -388,7 +372,7 @@ if __name__ == "__main__":
     print("3. ROBOCOP 'X' VS TERMINATOR 'O' -> AI vs AI jajaj")
     opcion = int(input("Select a gamemode: "))
     if opcion == 1:
-        play_othello_vs_AI()
+        play_othello_vs_ai()
     elif opcion == 2:
         play_othello_vs_player()
     else:
