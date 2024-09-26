@@ -1,14 +1,15 @@
 import copy
 import time
+from othello_utils import is_valid_move, get_player_tokens, get_score, terminal_test, update_max_values, update_min_values
 
-N = 4
+board_size = 4
 COUNTER = 0
 EMPTY = 0
 BLACK = 1
 WHITE = -1
 
 def initialize_board():
-    board = [[EMPTY] * N for _ in range(N)]
+    board = [[EMPTY] * board_size for _ in range(board_size)]
     board[1][1] = BLACK
     board[1][2] = WHITE
     board[2][1] = WHITE
@@ -17,9 +18,9 @@ def initialize_board():
 
 def print_board(board):
     print("  0 1 2 3")
-    for i in range(N):
+    for i in range(board_size):
         row = str(i) + " "
-        for j in range(N):
+        for j in range(board_size):
             if board[i][j] == EMPTY:
                 row += ". "
             elif board[i][j] == BLACK:
@@ -28,22 +29,10 @@ def print_board(board):
                 row += "O "
         print(row)
 
-def is_valid_move(valid_moves, move):
-    if move in valid_moves:
-        return True
-    return False
-
-def get_player_tokens(board, player):
-    player_tokens = []
-    for row in range(N):
-        for column in range(N):
-            if board[row][column] == player:
-                player_tokens.append((row, column))
-    return player_tokens
 
 def get_valid_moves(board, player):
     valid_moves = set()
-    for token in get_player_tokens(board, player):
+    for token in get_player_tokens(board, player, board_size):
         valid_moves.update(get_valid_moves_for_token(board, player, token))
     return list(valid_moves)
 
@@ -76,7 +65,7 @@ def find_valid_move_in_direction(board, player, token, direction):
     return None
 
 def is_valid_position(x, y):
-    return 0 <= x < N and 0 <= y < N
+    return 0 <= x < board_size and 0 <= y < board_size
 
 def change_board(to_flip, player, board):
     for flip_row, flip_col in to_flip:
@@ -99,38 +88,19 @@ def make_move(board, player, move):
 
 def find_flips_in_direction(board, player, new_row, new_column, difference_row, difference_column):
     to_flip = []
-    while 0 <= new_row < N and 0 <= new_column < N and board[new_row][new_column] == -player:
+    while 0 <= new_row < board_size and 0 <= new_column < board_size and board[new_row][new_column] == -player:
         to_flip.append((new_row, new_column))
         new_row += difference_row
         new_column += difference_column
-    if 0 <= new_row < N and 0 <= new_column < N and board[new_row][new_column] == player:
+    if 0 <= new_row < board_size and 0 <= new_column < board_size and board[new_row][new_column] == player:
         return to_flip
     return []
-
-def get_score(board):
-    black_score = sum(row.count(BLACK) for row in board)
-    white_score = sum(row.count(WHITE) for row in board)
-    return black_score, white_score
-
-def terminal_test(board):
-    return all(all(cell != EMPTY for cell in row) for row in board)
-
-
-def update_max_values(evaluation, max_val, move, best_move):
-    if evaluation > max_val:
-        return evaluation, move
-    return max_val, best_move
-
-def update_min_values(evaluation, min_val, move, best_move):
-    if evaluation < min_val:
-        return evaluation, move
-    return min_val, best_move
 
 def min_max_alpha_beta(board, player, alpha, beta, maximizing_player):
     global COUNTER
     COUNTER += 1
-    if terminal_test(board):
-        return get_score(board)[1], 0
+    if terminal_test(board, EMPTY):
+        return get_score(board, BLACK, WHITE)[1], 0
     
     valid_moves = get_valid_moves(board, player)
     if maximizing_player:
@@ -178,7 +148,7 @@ def get_min_max_move(board, player):
 def play_othello_vs_ai():
     board = initialize_board()
     current_player = BLACK
-    while not terminal_test(board):
+    while not terminal_test(board, EMPTY):
         print_board(board)
         print("Actual player:", "X" if current_player == BLACK else "O")
         
@@ -223,7 +193,7 @@ def get_player_input():
 
 def display_game_result(board):
     print_board(board)
-    black_score, white_score = get_score(board)
+    black_score, white_score = get_score(board, BLACK, WHITE)
     print("States:", COUNTER)
     if black_score > white_score:
         print("X Won.")

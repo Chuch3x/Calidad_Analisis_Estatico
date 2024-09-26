@@ -1,13 +1,14 @@
 import copy
+from othello_utils import is_valid_move, get_player_tokens
 
-N = 8
+board_size = 8
 
 EMPTY = 0
 BLACK = 1
 WHITE = -1
 
 def initialize_board():
-    board = [[EMPTY] * N for _ in range(N)]
+    board = [[EMPTY] * board_size for _ in range(board_size)]
     board[3][3] = BLACK
     board[3][4] = WHITE
     board[4][3] = WHITE
@@ -17,9 +18,9 @@ def initialize_board():
 def print_board(board):
     print("  A B C D E F G H")
     print("  0 1 2 3 4 5 6 7")
-    for i in range(N):
+    for i in range(board_size):
         row = str(i) + " "
-        for j in range(N):
+        for j in range(board_size):
             if board[i][j] == EMPTY:
                 row += ". "
             elif board[i][j] == BLACK:
@@ -28,22 +29,10 @@ def print_board(board):
                 row += "O "
         print(row)
 
-def is_valid_move(valid_moves, move):
-    if move in valid_moves:
-        return True
-    return False
-
-def get_player_tokens(board, player):
-    player_tokens = []
-    for row in range(N):
-        for column in range(N):
-            if board[row][column] == player:
-                player_tokens.append((row, column))
-    return player_tokens
 
 def get_valid_moves(board, player):
     valid_moves = []
-    for token in get_player_tokens(board, player):
+    for token in get_player_tokens(board, player, board_size):
         valid_moves.extend(find_valid_moves_around_token(board, player, token))
     return list(set(valid_moves))  # Eliminar duplicados
 
@@ -58,13 +47,13 @@ def find_valid_moves_around_token(board, player, token):
     return valid_moves
 
 def is_opponent_piece(board, row, col, player):
-    return 0 <= row < N and 0 <= col < N and board[row][col] == -player
+    return 0 <= row < board_size and 0 <= col < board_size and board[row][col] == -player
 
 def find_empty_spot_in_direction(board, player, row, col, diff_row, diff_col):
-    while 0 <= row < N and 0 <= col < N and board[row][col] == -player:
+    while 0 <= row < board_size and 0 <= col < board_size and board[row][col] == -player:
         row += diff_row
         col += diff_col
-    if 0 <= row < N and 0 <= col < N and board[row][col] == EMPTY:
+    if 0 <= row < board_size and 0 <= col < board_size and board[row][col] == EMPTY:
         return row, col
     return None
 
@@ -87,11 +76,11 @@ def get_directions():
 def get_flip_positions(board, player, row, col, diff_row, diff_col):
     to_flip = []
     new_row, new_col = row + diff_row, col + diff_col
-    while 0 <= new_row < N and 0 <= new_col < N and board[new_row][new_col] == -player:
+    while 0 <= new_row < board_size and 0 <= new_col < board_size and board[new_row][new_col] == -player:
         to_flip.append((new_row, new_col))
         new_row += diff_row
         new_col += diff_col
-    if 0 <= new_row < N and 0 <= new_col < N and board[new_row][new_col] == player:
+    if 0 <= new_row < board_size and 0 <= new_col < board_size and board[new_row][new_col] == player:
         return to_flip
     return []
 

@@ -1,5 +1,6 @@
 import copy
 import time
+from othello_utils import get_score, terminal_test, update_max_values, update_min_values
 
 N = 6
 COUNTER = 0
@@ -96,29 +97,11 @@ def find_flips_in_direction(board, player, new_row, new_column, difference_row, 
         return to_flip
     return []
 
-def get_score(board):
-    black_score = sum(row.count(BLACK) for row in board)
-    white_score = sum(row.count(WHITE) for row in board)
-    return black_score, white_score
-
-def terminal_test(board):
-    return all(all(cell != EMPTY for cell in row) for row in board)
-
-def update_max_values(evaluation, max_val, move, best_move):
-    if evaluation > max_val:
-        return evaluation, move
-    return max_val, best_move
-
-def update_min_values(evaluation, min_val, move, best_move):
-    if evaluation < min_val:
-        return evaluation, move
-    return min_val, best_move
-
 def min_max_alpha_beta(board, player, alpha, beta, maximizing_player):
     global COUNTER
     COUNTER += 1
-    if terminal_test(board):
-        return get_score(board)[1], 0
+    if terminal_test(board, EMPTY):
+        return get_score(board, BLACK, WHITE)[1], 0
     
     valid_moves = get_valid_moves(board, player)
     if maximizing_player:
@@ -166,7 +149,7 @@ def get_min_max_move(board, player):
 def play_othello_vs_ai():
     board = initialize_board()
     current_player = BLACK
-    while not terminal_test(board):
+    while not terminal_test(board, EMPTY):
         print_board(board)
         print("Actual player:", "X" if current_player == BLACK else "O")
         
@@ -211,7 +194,7 @@ def get_player_input():
 
 def display_game_result(board):
     print_board(board)
-    black_score, white_score = get_score(board)
+    black_score, white_score = get_score(board, BLACK, WHITE)
     print("States:", COUNTER)
     if black_score > white_score:
         print("X Won.")

@@ -2,5 +2,5 @@ projectKey=Calidad-Sept-2024
 serverUrl=http://localhost:9000
 serverVersion=10.6.0.92116
 dashboardUrl=http://localhost:9000/dashboard?id=Calidad-Sept-2024
-ceTaskId=6c089559-f8d4-45dd-ac96-5de10adb84f2
-ceTaskUrl=http://localhost:9000/api/ce/task?id=6c089559-f8d4-45dd-ac96-5de10adb84f2
+ceTaskId=954891da-b608-464a-a718-059427630317
+ceTaskUrl=http://localhost:9000/api/ce/task?id=954891da-b608-464a-a718-059427630317
