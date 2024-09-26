@@ -1,6 +1,6 @@
-projectKey=OthelloMinMax
+projectKey=Calidad-Sept-2024
 serverUrl=http://localhost:9000
 serverVersion=10.6.0.92116
-dashboardUrl=http://localhost:9000/dashboard?id=OthelloMinMax
-ceTaskId=22cd2416-7105-4029-8e47-3b34913d03c4
-ceTaskUrl=http://localhost:9000/api/ce/task?id=22cd2416-7105-4029-8e47-3b34913d03c4
+dashboardUrl=http://localhost:9000/dashboard?id=Calidad-Sept-2024
+ceTaskId=6c089559-f8d4-45dd-ac96-5de10adb84f2
+ceTaskUrl=http://localhost:9000/api/ce/task?id=6c089559-f8d4-45dd-ac96-5de10adb84f2

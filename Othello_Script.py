@@ -235,7 +235,7 @@ def get_min_max_move(board, player, depth):
     valid_moves = get_valid_moves(board, player)
 
     if len(valid_moves) > 0:
-        eval, best_move = min_max_alpha_beta_heuristic_pruning_heuristic_1(board, depth, player, float('-inf'), float('inf'), False)
+        _, best_move = min_max_alpha_beta_heuristic_pruning_heuristic_1(board, depth, player, float('-inf'), float('inf'), False)
         print(best_move)
         if best_move == 0:
             return get_valid_moves(board, player)[0]
@@ -248,7 +248,7 @@ def get_min_max_move_heuristic_2(board, player, depth):
     valid_moves = get_valid_moves(board, player)
 
     if len(valid_moves) > 0:
-        eval, best_move = min_max_alpha_beta_heuristic_pruning_heuristic_2(board, depth, player, float('-inf'), float('inf'), False)
+        _, best_move = min_max_alpha_beta_heuristic_pruning_heuristic_2(board, depth, player, float('-inf'), float('inf'), False)
         print(best_move)
         if best_move == 0:
             return get_valid_moves(board, player)[0]
@@ -266,7 +266,7 @@ def play_othello_vs_ai():
         
         if current_player == WHITE:
             row, col = get_min_max_move(board, current_player, 3)
-            if handle_no_moves(board, current_player, row, col, "O"):
+            if handle_no_moves( row, col, "O"):
                 continue
         else:
             row, col = get_player_move(board, current_player)
@@ -332,12 +332,12 @@ def play_othello_ai_vs_ai():
         
         if current_player == WHITE:
             row, col = get_min_max_move(board, current_player, 3)
-            if handle_no_moves(board, current_player, row, col, "O"):
+            if handle_no_moves( row, col, "O"):
                 current_player = -current_player  # Update current_player here
                 continue
         else:
             row, col = get_min_max_move_heuristic_2(board, current_player, 3)
-            if handle_no_moves(board, current_player, row, col, "X"):
+            if handle_no_moves( row, col, "X"):
                 current_player = -current_player  # Update current_player here
                 continue
 
@@ -348,7 +348,7 @@ def play_othello_ai_vs_ai():
             handle_game_end(board)
             break
 
-def handle_no_moves(board, current_player, row, col, player_symbol):
+def handle_no_moves(row, col, player_symbol):
     if row == -1 and col == -1:
         print(f"{player_symbol} HAS NO MOVEMENTS")
         return True
