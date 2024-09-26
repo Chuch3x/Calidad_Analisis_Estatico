@@ -41,27 +41,27 @@ def get_player_tokens(board, player):
                 player_tokens.append((row, column))
     return player_tokens
 
-def check_direction_for_valid_move(board, token, differenceRow, differenceColumn, player):
-    adyRow = token[0] + differenceRow
-    adyCol = token[1] + differenceColumn
+def check_direction_for_valid_move(board, token, difference_row, difference_column, player):
+    ady_row = token[0] + difference_row
+    ady_col = token[1] + difference_column
     
-    if 0 <= adyRow < N and 0 <= adyCol < N and board[adyRow][adyCol] == -player:
-        while 0 <= adyRow < N and 0 <= adyCol < N and board[adyRow][adyCol] == -player:
-            adyRow += differenceRow
-            adyCol += differenceColumn
+    if 0 <= ady_row < N and 0 <= ady_col < N and board[ady_row][ady_col] == -player:
+        while 0 <= ady_row < N and 0 <= ady_col < N and board[ady_row][ady_col] == -player:
+            ady_row += difference_row
+            ady_col += difference_column
             
-        if 0 <= adyRow < N and 0 <= adyCol < N and board[adyRow][adyCol] == EMPTY:
-            return (adyRow, adyCol)
+        if 0 <= ady_row < N and 0 <= ady_col < N and board[ady_row][ady_col] == EMPTY:
+            return (ady_row, ady_col)
     return None
 
 def get_valid_moves(board, player):
     valid_moves = []
     for token in get_player_tokens(board, player):
-        for differenceRow in [-1, 0, 1]: 
-            for differenceColumn in [-1, 0, 1]:
-                if differenceRow == 0 and differenceColumn == 0:
+        for difference_row in [-1, 0, 1]: 
+            for difference_column in [-1, 0, 1]:
+                if difference_row == 0 and difference_column == 0:
                     continue
-                move = check_direction_for_valid_move(board, token, differenceRow, differenceColumn, player)
+                move = check_direction_for_valid_move(board, token, difference_row, difference_column, player)
                 if move:
                     valid_moves.append(move)
     return valid_moves
@@ -76,23 +76,23 @@ def make_move(board, player, move):
     if not is_valid_move(get_valid_moves(board, player), move):
         return False
     board[row][col] = player
-    for differenceRow in [-1, 0, 1]:
-        for differenceColumn in [-1, 0, 1]:
-            if differenceRow == 0 and differenceColumn == 0:
+    for difference_row in [-1, 0, 1]:
+        for difference_column in [-1, 0, 1]:
+            if difference_row == 0 and difference_column == 0:
                 continue
-            newRow, newColumn = row + differenceRow, col + differenceColumn
-            to_flip = find_flips_in_direction(board, player, newRow, newColumn, differenceRow, differenceColumn)
+            new_row, new_column = row + difference_row, col + difference_column
+            to_flip = find_flips_in_direction(board, player, new_row, new_column, difference_row, difference_column)
             if to_flip:
                 change_board(to_flip, player, board)
     return True
 
-def find_flips_in_direction(board, player, newRow, newColumn, differenceRow, differenceColumn):
+def find_flips_in_direction(board, player, new_row, new_column, difference_row, difference_column):
     to_flip = []
-    while 0 <= newRow < N and 0 <= newColumn < N and board[newRow][newColumn] == -player:
-        to_flip.append((newRow, newColumn))
-        newRow += differenceRow
-        newColumn += differenceColumn
-    if 0 <= newRow < N and 0 <= newColumn < N and board[newRow][newColumn] == player:
+    while 0 <= new_row < N and 0 <= new_column < N and board[new_row][new_column] == -player:
+        to_flip.append((new_row, new_column))
+        new_row += difference_row
+        new_column += difference_column
+    if 0 <= new_row < N and 0 <= new_column < N and board[new_row][new_column] == player:
         return to_flip
     return []
 
