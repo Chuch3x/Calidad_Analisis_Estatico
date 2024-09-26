@@ -2,5 +2,5 @@ projectKey=OthelloMinMax
 serverUrl=http://localhost:9000
 serverVersion=10.6.0.92116
 dashboardUrl=http://localhost:9000/dashboard?id=OthelloMinMax
-ceTaskId=b85d3f06-5bb5-4ec3-884d-9546fc57dd6f
-ceTaskUrl=http://localhost:9000/api/ce/task?id=b85d3f06-5bb5-4ec3-884d-9546fc57dd6f
+ceTaskId=22cd2416-7105-4029-8e47-3b34913d03c4
+ceTaskUrl=http://localhost:9000/api/ce/task?id=22cd2416-7105-4029-8e47-3b34913d03c4

@@ -78,26 +78,34 @@ def find_valid_move_in_direction(board, player, token, direction):
 def is_valid_position(x, y):
     return 0 <= x < N and 0 <= y < N
 
+def change_board(to_flip, player, board):
+    for flip_row, flip_col in to_flip:
+        board[flip_row][flip_col] = player
+
 def make_move(board, player, move):
-    row = move[0]
-    col = move[1]
-    if not is_valid_move(get_valid_moves(board,player), move):
+    row, col = move
+    if not is_valid_move(get_valid_moves(board, player), move):
         return False
     board[row][col] = player
-    for differenceRow in [-1, 0, 1]:
-        for differenceColumn in [-1, 0, 1]:
-            if differenceRow == 0 and differenceColumn == 0:
+    for difference_row in [-1, 0, 1]:
+        for difference_column in [-1, 0, 1]:
+            if difference_row == 0 and difference_column == 0:
                 continue
-            newRow, newColumn = row + differenceRow, col + differenceColumn
-            to_flip = []
-            while 0 <= newRow < N and 0 <= newColumn < N and board[newRow][newColumn] == -player:
-                to_flip.append((newRow, newColumn))
-                newRow += differenceRow
-                newColumn += differenceColumn
-            if 0 <= newRow < N and 0 <= newColumn < N and board[newRow][newColumn] == player:
-                for flip_row, flip_col in to_flip:
-                    board[flip_row][flip_col] = player
+            new_row, new_column = row + difference_row, col + difference_column
+            to_flip = find_flips_in_direction(board, player, new_row, new_column, difference_row, difference_column)
+            if to_flip:
+                change_board(to_flip, player, board)
     return True
+
+def find_flips_in_direction(board, player, new_row, new_column, difference_row, difference_column):
+    to_flip = []
+    while 0 <= new_row < N and 0 <= new_column < N and board[new_row][new_column] == -player:
+        to_flip.append((new_row, new_column))
+        new_row += difference_row
+        new_column += difference_column
+    if 0 <= new_row < N and 0 <= new_column < N and board[new_row][new_column] == player:
+        return to_flip
+    return []
 
 def get_score(board):
     black_score = sum(row.count(BLACK) for row in board)
