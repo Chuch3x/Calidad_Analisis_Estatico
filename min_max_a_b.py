@@ -95,6 +95,16 @@ def get_score(board):
 def terminal_test(board):
     return all(all(cell != EMPTY for cell in row) for row in board)
 
+def update_max_values(evaluation, max_val, move, best_move):
+    if evaluation > max_val:
+        return evaluation, move
+    return max_val, best_move
+
+def update_min_values(evaluation, min_val, move, best_move):
+    if evaluation < min_val:
+        return evaluation, move
+    return min_val, best_move
+
 def min_max_alpha_beta(board, player, alpha, beta, maximizing_player):
     global COUNTER
     COUNTER += 1
@@ -109,10 +119,8 @@ def min_max_alpha_beta(board, player, alpha, beta, maximizing_player):
             new_board = copy.deepcopy(board)
             make_move(new_board, player, move)
             evaluation, best_move = min_max_alpha_beta(new_board, player, alpha, beta, False)
-            
-            if evaluation > max_val:
-                max_val = evaluation
-                best_move = move
+
+            max_val, best_move = update_max_values(evaluation, max_val, move, best_move)
 
             alpha = max(alpha, evaluation)
             if beta <= alpha:
@@ -126,9 +134,7 @@ def min_max_alpha_beta(board, player, alpha, beta, maximizing_player):
             make_move(new_board, -player, move)
             evaluation, best_move = min_max_alpha_beta(new_board, player, alpha, beta, True)
 
-            if evaluation < min_val:
-                min_val = evaluation
-                best_move = move
+            min_val, best_move = update_min_values(evaluation, min_val, move, best_move)
 
             beta = min(beta, evaluation)
             if beta <= alpha:
