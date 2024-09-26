@@ -41,50 +41,51 @@ def get_player_tokens(board, player):
                 player_tokens.append((row, column))
     return player_tokens
 
-def get_directions():
-    return [(dRow, dCol) for dRow in [-1, 0, 1] for dCol in [-1, 0, 1] if not (dRow == 0 and dCol == 0)]
-
-def get_adjacent_position(token, direction):
-    return token[0] + direction[0], token[1] + direction[1]
-
-def traverse_direction(board, token, direction, player):
-    row, col = get_adjacent_position(token, direction)
-    positions_to_check = []
-    while 0 <= row < N and 0 <= col < N and board[row][col] == -player:
-        positions_to_check.append((row, col))
-        row, col = row + direction[0], col + direction[1]
-    if 0 <= row < N and 0 <= col < N and board[row][col] == EMPTY:
-        return positions_to_check
-    return []
+def check_direction_for_valid_move(board, token, differenceRow, differenceColumn, player):
+    adyRow = token[0] + differenceRow
+    adyCol = token[1] + differenceColumn
+    
+    if 0 <= adyRow < N and 0 <= adyCol < N and board[adyRow][adyCol] == -player:
+        while 0 <= adyRow < N and 0 <= adyCol < N and board[adyRow][adyCol] == -player:
+            adyRow += differenceRow
+            adyCol += differenceColumn
+            
+        if 0 <= adyRow < N and 0 <= adyCol < N and board[adyRow][adyCol] == EMPTY:
+            return (adyRow, adyCol)
+    return None
 
 def get_valid_moves(board, player):
     valid_moves = []
     for token in get_player_tokens(board, player):
-        for direction in get_directions():
-            if (flipped_positions := traverse_direction(board, token, direction, player)):
-                valid_moves.append(flipped_positions[-1])
+        for differenceRow in [-1, 0, 1]: 
+            for differenceColumn in [-1, 0, 1]:
+                if differenceRow == 0 and differenceColumn == 0:
+                    continue
+                move = check_direction_for_valid_move(board, token, differenceRow, differenceColumn, player)
+                if move:
+                    valid_moves.append(move)
     return valid_moves
 
 def make_move(board, player, move):
-    if not is_valid_move(get_valid_moves(board, player), move):
+    row = move[0]
+    col = move[1]
+    if not is_valid_move(get_valid_moves(board,player), move):
         return False
-    row, col = move
     board[row][col] = player
-    for direction in get_directions():
-        to_flip = flip_tokens(row, col, direction, board, player)
-        for flip_row, flip_col in to_flip:
-            board[flip_row][flip_col] = player
+    for differenceRow in [-1, 0, 1]:
+        for differenceColumn in [-1, 0, 1]:
+            if differenceRow == 0 and differenceColumn == 0:
+                continue
+            newRow, newColumn = row + differenceRow, col + differenceColumn
+            to_flip = []
+            while 0 <= newRow < N and 0 <= newColumn < N and board[newRow][newColumn] == -player:
+                to_flip.append((newRow, newColumn))
+                newRow += differenceRow
+                newColumn += differenceColumn
+            if 0 <= newRow < N and 0 <= newColumn < N and board[newRow][newColumn] == player:
+                for flip_row, flip_col in to_flip:
+                    board[flip_row][flip_col] = player
     return True
-
-def flip_tokens(row, col, direction, board, player):
-        d_row, d_col = direction
-        to_flip = []
-        row, col = row + d_row, col + d_col
-        while 0 <= row < N and 0 <= col < N and board[row][col] == -player:
-            to_flip.append((row, col))
-            row += d_row
-            col += d_col
-        return to_flip if 0 <= row < N and 0 <= col < N and board[row][col] == player else []
 
 def get_score(board):
     black_score = sum(row.count(BLACK) for row in board)
@@ -158,8 +159,9 @@ def play_othello_vs_ai():
             handle_ai_turn(board, current_player)
         else:
             handle_player_turn(board, current_player)
-
+        
         current_player = -current_player
+    
     display_game_result(board)
 
 def handle_ai_turn(board, player):
