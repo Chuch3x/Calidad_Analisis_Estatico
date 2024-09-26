@@ -65,19 +65,18 @@ def get_valid_moves(board, player):
                 valid_moves.append(flipped_positions[-1])
     return valid_moves
 
-
-
-def get_directions():
-    for d_row in [-1, 0, 1]:
-        for d_col in [-1, 0, 1]:
-            if d_row != 0 or d_col != 0:
-                yield d_row, d_col
-
 def make_move(board, player, move):
     if not is_valid_move(get_valid_moves(board, player), move):
         return False
+    row, col = move
+    board[row][col] = player
+    for direction in get_directions():
+        to_flip = flip_tokens(row, col, direction, board, player)
+        for flip_row, flip_col in to_flip:
+            board[flip_row][flip_col] = player
+    return True
 
-    def flip_tokens(row, col, direction):
+def flip_tokens(row, col, direction, board, player):
         d_row, d_col = direction
         to_flip = []
         row, col = row + d_row, col + d_col
@@ -87,15 +86,6 @@ def make_move(board, player, move):
             col += d_col
         return to_flip if 0 <= row < N and 0 <= col < N and board[row][col] == player else []
 
-    row, col = move
-    board[row][col] = player
-    for direction in get_directions():
-        to_flip = flip_tokens(row, col, direction)
-        for flip_row, flip_col in to_flip:
-            board[flip_row][flip_col] = player
-
-    return True
-
 def get_score(board):
     black_score = sum(row.count(BLACK) for row in board)
     white_score = sum(row.count(WHITE) for row in board)
@@ -104,7 +94,7 @@ def get_score(board):
 def terminal_test(board):
     return all(all(cell != EMPTY for cell in row) for row in board)
 
-def Min_Max_Alpha_Beta(board, player, alpha, beta, maximizing_player):
+def min_max_alpha_beta(board, player, alpha, beta, maximizing_player):
     global COUNTER
     COUNTER += 1
     if terminal_test(board):
@@ -117,7 +107,7 @@ def Min_Max_Alpha_Beta(board, player, alpha, beta, maximizing_player):
         for move in valid_moves:
             new_board = copy.deepcopy(board)
             make_move(new_board, player, move)
-            evaluation, best_move = Min_Max_Alpha_Beta(new_board, player, alpha, beta, False)
+            evaluation, best_move = min_max_alpha_beta(new_board, player, alpha, beta, False)
             
             if evaluation > max_val:
                 max_val = evaluation
@@ -133,7 +123,7 @@ def Min_Max_Alpha_Beta(board, player, alpha, beta, maximizing_player):
         for move in valid_moves:
             new_board = copy.deepcopy(board)
             make_move(new_board, -player, move)
-            evaluation, best_move = Min_Max_Alpha_Beta(new_board, player, alpha, beta, True)
+            evaluation, best_move = min_max_alpha_beta(new_board, player, alpha, beta, True)
 
             if evaluation < min_val:
                 min_val = evaluation
@@ -148,7 +138,7 @@ def get_min_max_move(board, player):
     valid_moves = get_valid_moves(board, player)
 
     if len(valid_moves) > 0:
-        _, best_move= Min_Max_Alpha_Beta(board, player, float('-inf'), float('inf'), False)
+        _, best_move= min_max_alpha_beta(board, player, float('-inf'), float('inf'), False)
         print("IA move: ", best_move)
         if best_move == 0:
             return get_valid_moves(board, player)[0]
@@ -168,9 +158,8 @@ def play_othello_vs_ai():
             handle_ai_turn(board, current_player)
         else:
             handle_player_turn(board, current_player)
-        
+
         current_player = -current_player
-    
     display_game_result(board)
 
 def handle_ai_turn(board, player):
