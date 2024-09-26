@@ -66,10 +66,14 @@ def get_valid_moves(board, player):
                     valid_moves.append(move)
     return valid_moves
 
+def change_board(to_flip, player, board):
+    for flip_row, flip_col in to_flip:
+        board[flip_row][flip_col] = player   
+
 def make_move(board, player, move):
     row = move[0]
     col = move[1]
-    if not is_valid_move(get_valid_moves(board,player), move):
+    if not is_valid_move(get_valid_moves(board, player), move):
         return False
     board[row][col] = player
     for differenceRow in [-1, 0, 1]:
@@ -77,15 +81,20 @@ def make_move(board, player, move):
             if differenceRow == 0 and differenceColumn == 0:
                 continue
             newRow, newColumn = row + differenceRow, col + differenceColumn
-            to_flip = []
-            while 0 <= newRow < N and 0 <= newColumn < N and board[newRow][newColumn] == -player:
-                to_flip.append((newRow, newColumn))
-                newRow += differenceRow
-                newColumn += differenceColumn
-            if 0 <= newRow < N and 0 <= newColumn < N and board[newRow][newColumn] == player:
-                for flip_row, flip_col in to_flip:
-                    board[flip_row][flip_col] = player
+            to_flip = find_flips_in_direction(board, player, newRow, newColumn, differenceRow, differenceColumn)
+            if to_flip:
+                change_board(to_flip, player, board)
     return True
+
+def find_flips_in_direction(board, player, newRow, newColumn, differenceRow, differenceColumn):
+    to_flip = []
+    while 0 <= newRow < N and 0 <= newColumn < N and board[newRow][newColumn] == -player:
+        to_flip.append((newRow, newColumn))
+        newRow += differenceRow
+        newColumn += differenceColumn
+    if 0 <= newRow < N and 0 <= newColumn < N and board[newRow][newColumn] == player:
+        return to_flip
+    return []
 
 def get_score(board):
     black_score = sum(row.count(BLACK) for row in board)
