@@ -42,23 +42,41 @@ def get_player_tokens(board, player):
     return player_tokens
 
 def get_valid_moves(board, player):
-    valid_moves = []
+    valid_moves = set()
     for token in get_player_tokens(board, player):
-        for differenceRow in [-1, 0, 1]: 
-            for differenceColumn in [-1, 0, 1]:
-                if differenceRow == 0 and differenceColumn == 0:
-                    continue
-                adyRow = token[0] + differenceRow
-                adyCol = token[1] + differenceColumn
-                
-                if 0 <= adyRow < N and 0 <= adyCol < N and board[adyRow][adyCol] == -player:
-                    while 0 <= adyRow < N and 0 <= adyCol < N and board[adyRow][adyCol] == -player:
-                        adyRow += differenceRow
-                        adyCol += differenceColumn
-                        
-                    if 0 <= adyRow < N and 0 <= adyCol < N and board[adyRow][adyCol] == EMPTY:
-                        valid_moves.append((adyRow, adyCol))
+        valid_moves.update(get_valid_moves_for_token(board, player, token))
+    return list(valid_moves)
+
+def get_valid_moves_for_token(board, player, token):
+    valid_moves = []
+    for direction in get_directions():
+        move = find_valid_move_in_direction(board, player, token, direction)
+        if move:
+            valid_moves.append(move)
     return valid_moves
+
+def get_directions():
+    return [(dx, dy) for dx in [-1, 0, 1] for dy in [-1, 0, 1] if dx != 0 or dy != 0]
+
+def find_valid_move_in_direction(board, player, token, direction):
+    dx, dy = direction
+    x, y = token
+    x += dx
+    y += dy
+    
+    if not is_valid_position(x, y) or board[x][y] != -player:
+        return None
+    
+    while is_valid_position(x, y) and board[x][y] == -player:
+        x += dx
+        y += dy
+    
+    if is_valid_position(x, y) and board[x][y] == EMPTY:
+        return (x, y)
+    return None
+
+def is_valid_position(x, y):
+    return 0 <= x < N and 0 <= y < N
 
 def make_move(board, player, move):
     row = move[0]
