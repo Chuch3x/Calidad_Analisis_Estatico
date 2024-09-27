@@ -1,15 +1,15 @@
 import copy
 import time
-from othello_utils import get_score, terminal_test, update_max_values, update_min_values
+from othello_utils import get_score, terminal_test, update_max_values, update_min_values, min_max_alpha_beta, get_min_max_move, play_othello_vs_ai, handle_ai_turn, handle_player_turn, get_player_input, display_game_result
 
 N = 6
 COUNTER = 0
-EMPTY = 0
+EMPTY_CELL = 0
 BLACK = 1
 WHITE = -1
 
 def initialize_board():
-    board = [[EMPTY] * N for _ in range(N)]
+    board = [[EMPTY_CELL] * N for _ in range(N)]
     board[2][2] = BLACK
     board[2][3] = WHITE
     board[3][2] = WHITE
@@ -21,7 +21,7 @@ def print_board(board):
     for i in range(N):
         row = str(i) + " "
         for j in range(N):
-            if board[i][j] == EMPTY:
+            if board[i][j] == EMPTY_CELL:
                 row += ". "
             elif board[i][j] == BLACK:
                 row += "X "
@@ -51,7 +51,7 @@ def check_direction_for_valid_move(board, token, difference_row, difference_colu
             ady_row += difference_row
             ady_col += difference_column
             
-        if 0 <= ady_row < N and 0 <= ady_col < N and board[ady_row][ady_col] == EMPTY:
+        if 0 <= ady_row < N and 0 <= ady_col < N and board[ady_row][ady_col] == EMPTY_CELL:
             return (ady_row, ady_col)
     return None
 
@@ -97,117 +97,11 @@ def find_flips_in_direction(board, player, new_row, new_column, difference_row, 
         return to_flip
     return []
 
-def min_max_alpha_beta(board, player, alpha, beta, maximizing_player):
-    global COUNTER
-    COUNTER += 1
-    if terminal_test(board, EMPTY):
-        return get_score(board, BLACK, WHITE)[1], 0
-    
-    valid_moves = get_valid_moves(board, player)
-    if maximizing_player:
-        max_val = float('-inf')
-        best_move = None
-        for move in valid_moves:
-            new_board = copy.deepcopy(board)
-            make_move(new_board, player, move)
-            evaluation, best_move = min_max_alpha_beta(new_board, player, alpha, beta, False)
-
-            max_val, best_move = update_max_values(evaluation, max_val, move, best_move)
-
-            alpha = max(alpha, evaluation)
-            if beta <= alpha:
-                break
-        return max_val, best_move
-    else:
-        min_val = float('inf')
-        best_move = None
-        for move in valid_moves:
-            new_board = copy.deepcopy(board)
-            make_move(new_board, -player, move)
-            evaluation, best_move = min_max_alpha_beta(new_board, player, alpha, beta, True)
-
-            min_val, best_move = update_min_values(evaluation, min_val, move, best_move)
-
-            beta = min(beta, evaluation)
-            if beta <= alpha:
-                break
-        return min_val, best_move
-    
-def get_min_max_move(board, player):
-    valid_moves = get_valid_moves(board, player)
-
-    if len(valid_moves) > 0:
-        _, best_move= min_max_alpha_beta(board, player, float('-inf'), float('inf'), False)
-        print("IA move: ", best_move)
-        if best_move == 0:
-            return get_valid_moves(board, player)[0]
-        else:
-            return best_move
-    else:
-        return (-1, -1)
-
-def play_othello_vs_ai():
-    board = initialize_board()
-    current_player = BLACK
-    while not terminal_test(board, EMPTY):
-        print_board(board)
-        print("Actual player:", "X" if current_player == BLACK else "O")
-        
-        if current_player == WHITE:
-            handle_ai_turn(board, current_player)
-        else:
-            handle_player_turn(board, current_player)
-        
-        current_player = -current_player
-    
-    display_game_result(board)
-
-def handle_ai_turn(board, player):
-    row, col = get_min_max_move(board, player)
-    if row == -1 and col == -1:
-        print("O HAS NO MOVEMENTS")
-    else:
-        make_move(board, player, (row, col))
-
-def handle_player_turn(board, player):
-    valid_moves = get_valid_moves(board, player)
-    print("My Movements:", valid_moves)
-    
-    if not valid_moves:
-        print("You have no movements available")
-        return
-    
-    while True:
-        try:
-            row, col = get_player_input()
-            if is_valid_move(valid_moves, (row, col)):
-                make_move(board, player, (row, col))
-                break
-            print("Invalid move. Try again.")
-        except ValueError:
-            print("Invalid entry. Enter valid numbers.")
-
-def get_player_input():
-    row = int(input("ROW: "))
-    col = int(input("COLUMN: "))
-    return row, col
-
-def display_game_result(board):
-    print_board(board)
-    black_score, white_score = get_score(board, BLACK, WHITE)
-    print("States:", COUNTER)
-    if black_score > white_score:
-        print("X Won.")
-    elif white_score > black_score:
-        print("O Won.")
-    else:
-        print("Tie.")
-
 if __name__ == "__main__":
     opcion = 0
     print(" PLAYER VS IA")
     start_time = time.time()
-    play_othello_vs_ai()
+    play_othello_vs_ai(initialize_board, print_board, get_valid_moves, make_move)
     end_time = time.time()
     execution_time = end_time - start_time
     print(f"Execution Time: {execution_time} seconds")
